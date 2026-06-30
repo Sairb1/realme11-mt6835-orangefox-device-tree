@@ -171,9 +171,6 @@ TW_FRAMES_PER_SECOND := 120
 TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
 TW_MAX_BRIGHTNESS := 1000
 TW_DEFAULT_BRIGHTNESS := 1000
-TW_Y_OFFSET := 105
-TW_H_OFFSET := 105
-OFOX_TEST_UI := true
 
 # Flashlight (Torch)
 OFOX_FLASHLIGHT_ENABLE := true
