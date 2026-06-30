@@ -135,6 +135,14 @@ on boot
     start health-hal-2-1
     setprop sys.usb.config adb
 
+    # Set CPU scaling governor to performance on boot to resolve UI rendering lag
+    write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor performance
+    write /sys/devices/system/cpu/cpu6/cpufreq/scaling_governor performance
+
+    # Enable high touch report rate (120Hz/240Hz) if supported by the panel
+    write /proc/touchpanel/game_switch_enable 1
+    write /proc/touchpanel/oplus_tp_limit_enable 0
+
 service vendor.oplus.vibrator-default /system/bin/vendor.oplus.hardware.vibrator-service
     class hal
     user root
