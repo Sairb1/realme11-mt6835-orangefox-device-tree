@@ -166,7 +166,6 @@ TW_INCLUDE_REPACKTOOLS := true
 
 # TWRP / OrangeFox compatible flags
 # Display & Touch
-TW_FRAMES_PER_SECOND := 120
 TW_BRIGHTNESS_PATH := "/sys/class/leds/lcd-backlight/brightness"
 TW_MAX_BRIGHTNESS := 1000
 TW_DEFAULT_BRIGHTNESS := 1000
