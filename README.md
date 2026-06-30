@@ -29,9 +29,9 @@ This repository contains the OrangeFox Recovery Project device tree for the **Re
 ### 1. Security HAL & Decryption
 * Packs **`android.hardware.security.keymint@2.0`** and the necessary Trustonic/Mobicore binaries under `/odm/vendor/app/mcRegistry` to support FBE v2 decryption on Android 15 ROMs. Redundant duplicate firmware directories (like `/odm/firmware`) were removed to avoid AOSP symlink collisions.
 
-### 2. Display Performance & UI Lag Fix
-* Configured hardware OpenGL graphics acceleration using **`BOARD_USES_MINUI_GL := true`** in `BoardConfig.mk` to offload UI drawing from the CPU to the Mali-G57 GPU. 
-* Set CPU scaling governors on both Little (`cpu0`) and Big (`cpu6`) clusters to **`performance`** at boot inside `init.recovery.mt6835.rc` to solve CPU throttling.
+### 2. Display Performance & Hardware Limitations
+* Relies on the default `fbdev` software rasterizer for OrangeFox UI rendering. (Hardware OpenGL acceleration via `BOARD_USES_MINUI_GL` is deliberately disabled as the Mali GPU driver is not loaded in recovery, which would otherwise trigger an extremely slow `llvmpipe` software fallback and break the Fastbootd menu).
+* The stock Realme recovery kernel omits the `cpufreq` driver, locking the CPU to a low bootloader frequency (~800MHz). UI animations may drop frames (feel like 30Hz), but flashing and decryption speed are unaffected.
 
 ### 3. Touchscreen Refresh & Touch Lag Fix
 * Configured the Oplus touchpanel report rate switch `/proc/touchpanel/game_switch_enable` to `1` on boot to enable high touch panel reporting rate (120Hz/240Hz).
