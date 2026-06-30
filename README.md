@@ -27,15 +27,20 @@ This repository contains the OrangeFox Recovery Project device tree for the **Re
 ## Key Features & Fixes in this Device Tree
 
 ### 1. Security HAL & Decryption
-* Packs **`android.hardware.security.keymint@2.0`** and the necessary Trustonic/Mobicore binaries to support FBE v2 decryption on Android 15 ROMs.
+* Packs **`android.hardware.security.keymint@2.0`** and the necessary Trustonic/Mobicore binaries under `/odm/vendor/app/mcRegistry` to support FBE v2 decryption on Android 15 ROMs. Redundant duplicate firmware directories (like `/odm/firmware`) were removed to avoid AOSP symlink collisions.
 
-### 2. Touchscreen & Touch Lag Fix
+### 2. Display Performance & UI Lag Fix
+* Configured hardware OpenGL graphics acceleration using **`BOARD_USES_MINUI_GL := true`** in `BoardConfig.mk` to offload UI drawing from the CPU to the Mali-G57 GPU. 
+* Set CPU scaling governors on both Little (`cpu0`) and Big (`cpu6`) clusters to **`performance`** at boot inside `init.recovery.mt6835.rc` to solve CPU throttling.
+
+### 3. Touchscreen Refresh & Touch Lag Fix
+* Configured the Oplus touchpanel report rate switch `/proc/touchpanel/game_switch_enable` to `1` on boot to enable high touch panel reporting rate (120Hz/240Hz).
 * The stock vibrator AIDL HAL service (`vendor.oplus.vibrator-default`) fails on recovery kernels, causing touchscreen lag. This tree overrides it to a dummy instant-exit service mapping to `/system/bin/toybox` to force recovery to use standard sysfs vibration pathways, resolving touch lag.
 
-### 3. Timezone Sync
+### 4. Timezone Sync
 * Default timezone offset is configured to `GMT0` (with property `GMT` in `system.prop`). This reads the hardware clock directly without double-shifting the time after decryption, keeping both recovery and Android clocks perfectly synced.
 
-### 4. CPU Temperature Scaling
+### 5. CPU Temperature Scaling
 * Solves the power-down temp scaling issue by running a background loop script `/system/bin/cpu_temp.sh`. It reads the battery PMIC temperature and scales it to `/tmp/cpu_temp` where it displays correctly on the recovery interface.
 
 ---
@@ -117,9 +122,18 @@ sed -i "/SOONG_CONFIG_NAMESPACES += twrpVarsPlugin/i include bootable/recovery/o
 ## Building
 
 1. Place this device tree folder in `device/realme/chongqing`.
-2. Clear any previous build artifacts and compile:
+2. Clear the old output directories to prevent symlink conflicts, and compile:
 
 ```bash
+# 1. Staging files
+rm -rf ~/android/device/realme/chongqing/*
+cp -r /mnt/d/recoveries\ dt/orangefox-dt-working/* ~/android/device/realme/chongqing/
+
+# 2. Clear old output directory conflicts
+rm -rf ~/android/out/target/product/chongqing/recovery
+rm -rf ~/android/out/target/product/chongqing/root
+
+# 3. Compile
 cd ~/android
 make installclean
 source build/envsetup.sh
